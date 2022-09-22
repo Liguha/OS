@@ -9,20 +9,21 @@ int main(int argc, char* argv[])
     unlink("pipe2");
     if (mkfifo("pipe1", S_IREAD | S_IWRITE) == -1 || mkfifo("pipe2", S_IREAD | S_IWRITE) == -1)
     {
-        perror("Parrent: pipe create error");
+        perror("Parent: pipe create error");
         return -1;
     }
-    char fout[100];
-    if (scanf("%s\n", fout) <= 0)
+    char* fout;
+    size_t k = 0;
+    if (getline(&fout, &k, stdin) <= 0)
     {
-        perror("Parrent: file name error");
+        perror("Parent: file name error");
         return -1;
     }
 
     int id = fork();
     if (id == -1)
     {
-        perror("Parrent: fork error");
+        perror("Parent: fork error");
         return -1;
     }
     if (id == 0)
@@ -31,7 +32,7 @@ int main(int argc, char* argv[])
         int p2 = open("pipe2", O_RDONLY);
         if (p1 == -1 || p2 == -1)
         {
-            perror("Parrent: pipe open error");
+            perror("Parent: pipe open error");
             return -1;
         }
         char* str;
@@ -41,13 +42,13 @@ int main(int argc, char* argv[])
         {
             if (write(p1, str, s) == -1)
             {
-                perror("Parrent: write error");
+                perror("Parent: write error");
                 return -1;
             }
             char ok;
             if (read(p2, &ok, 1) <= 0)
             {
-                perror("Parrent: read error");
+                perror("Parent: read error");
                 return -1;
             }
             if (ok == '0')
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
                 char ans[19];
                 if (read(p2, ans, 19) <= 0)
                 {
-                    perror("Parrent: read error");
+                    perror("Parent: read error");
                     return -1;
                 }
                 printf("%s\n", ans);
