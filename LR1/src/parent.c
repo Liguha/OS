@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     {
         if (execl("child.out", fout, NULL) == -1)
         {
-            perror("Child: exec error\n");
+            perror("Child: exec error");
             return -1;
         }
     }
