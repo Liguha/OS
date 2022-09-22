@@ -64,6 +64,8 @@ int main(int argc, char* argv[])
         }        
         close(p1);
         close(p2);
+        unlink("pipe1");
+        unlink("pipe2");
     }
     else
     {
