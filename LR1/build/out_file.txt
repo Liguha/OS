@@ -1,3 +1,0 @@
-Second string.
-string number three;
-string with point.
