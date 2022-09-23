@@ -14,7 +14,8 @@ int main(int argc, char* argv[])
     }
     char* fout;
     size_t k = 0;
-    if (getline(&fout, &k, stdin) <= 0)
+    int fout_n = getline(&fout, &k, stdin);
+    if (fout_n <= 0)
     {
         perror("Parent: file name error");
         return -1;
@@ -70,6 +71,7 @@ int main(int argc, char* argv[])
     }
     else
     {
+        fout[fout_n - 1] = '\0';
         if (execl("child.out", fout, NULL) == -1)
         {
             perror("Child: exec error");
