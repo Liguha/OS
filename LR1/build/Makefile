@@ -57,7 +57,7 @@ RM = /snap/cmake/1156/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/liguha/OS/LR1/CMake
+CMAKE_SOURCE_DIR = /home/liguha/OS/LR1
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/liguha/OS/LR1/build
@@ -142,53 +142,53 @@ child.out/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/build
 .PHONY : child.out/fast
 
-home/liguha/OS/LR1/src/child.o: home/liguha/OS/LR1/src/child.c.o
-.PHONY : home/liguha/OS/LR1/src/child.o
+src/child.o: src/child.c.o
+.PHONY : src/child.o
 
 # target to build an object file
-home/liguha/OS/LR1/src/child.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o
-.PHONY : home/liguha/OS/LR1/src/child.c.o
+src/child.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/src/child.c.o
+.PHONY : src/child.c.o
 
-home/liguha/OS/LR1/src/child.i: home/liguha/OS/LR1/src/child.c.i
-.PHONY : home/liguha/OS/LR1/src/child.i
+src/child.i: src/child.c.i
+.PHONY : src/child.i
 
 # target to preprocess a source file
-home/liguha/OS/LR1/src/child.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.i
-.PHONY : home/liguha/OS/LR1/src/child.c.i
+src/child.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/src/child.c.i
+.PHONY : src/child.c.i
 
-home/liguha/OS/LR1/src/child.s: home/liguha/OS/LR1/src/child.c.s
-.PHONY : home/liguha/OS/LR1/src/child.s
+src/child.s: src/child.c.s
+.PHONY : src/child.s
 
 # target to generate assembly for a file
-home/liguha/OS/LR1/src/child.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.s
-.PHONY : home/liguha/OS/LR1/src/child.c.s
+src/child.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/child.out.dir/build.make CMakeFiles/child.out.dir/src/child.c.s
+.PHONY : src/child.c.s
 
-home/liguha/OS/LR1/src/parent.o: home/liguha/OS/LR1/src/parent.c.o
-.PHONY : home/liguha/OS/LR1/src/parent.o
+src/parent.o: src/parent.c.o
+.PHONY : src/parent.o
 
 # target to build an object file
-home/liguha/OS/LR1/src/parent.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/parent.out.dir/build.make CMakeFiles/parent.out.dir/home/liguha/OS/LR1/src/parent.c.o
-.PHONY : home/liguha/OS/LR1/src/parent.c.o
+src/parent.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/parent.out.dir/build.make CMakeFiles/parent.out.dir/src/parent.c.o
+.PHONY : src/parent.c.o
 
-home/liguha/OS/LR1/src/parent.i: home/liguha/OS/LR1/src/parent.c.i
-.PHONY : home/liguha/OS/LR1/src/parent.i
+src/parent.i: src/parent.c.i
+.PHONY : src/parent.i
 
 # target to preprocess a source file
-home/liguha/OS/LR1/src/parent.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/parent.out.dir/build.make CMakeFiles/parent.out.dir/home/liguha/OS/LR1/src/parent.c.i
-.PHONY : home/liguha/OS/LR1/src/parent.c.i
+src/parent.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/parent.out.dir/build.make CMakeFiles/parent.out.dir/src/parent.c.i
+.PHONY : src/parent.c.i
 
-home/liguha/OS/LR1/src/parent.s: home/liguha/OS/LR1/src/parent.c.s
-.PHONY : home/liguha/OS/LR1/src/parent.s
+src/parent.s: src/parent.c.s
+.PHONY : src/parent.s
 
 # target to generate assembly for a file
-home/liguha/OS/LR1/src/parent.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/parent.out.dir/build.make CMakeFiles/parent.out.dir/home/liguha/OS/LR1/src/parent.c.s
-.PHONY : home/liguha/OS/LR1/src/parent.c.s
+src/parent.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/parent.out.dir/build.make CMakeFiles/parent.out.dir/src/parent.c.s
+.PHONY : src/parent.c.s
 
 # Help Target
 help:
@@ -200,12 +200,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... child.out"
 	@echo "... parent.out"
-	@echo "... home/liguha/OS/LR1/src/child.o"
-	@echo "... home/liguha/OS/LR1/src/child.i"
-	@echo "... home/liguha/OS/LR1/src/child.s"
-	@echo "... home/liguha/OS/LR1/src/parent.o"
-	@echo "... home/liguha/OS/LR1/src/parent.i"
-	@echo "... home/liguha/OS/LR1/src/parent.s"
+	@echo "... src/child.o"
+	@echo "... src/child.i"
+	@echo "... src/child.s"
+	@echo "... src/parent.o"
+	@echo "... src/parent.i"
+	@echo "... src/parent.s"
 .PHONY : help
 
 

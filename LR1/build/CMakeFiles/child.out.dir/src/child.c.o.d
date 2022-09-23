@@ -1,6 +1,5 @@
-CMakeFiles/parent.out.dir/home/liguha/OS/LR1/src/parent.c.o: \
- /home/liguha/OS/LR1/src/parent.c /usr/include/stdc-predef.h \
- /usr/include/unistd.h /usr/include/features.h \
+CMakeFiles/child.out.dir/src/child.c.o: /home/liguha/OS/LR1/src/child.c \
+ /usr/include/stdc-predef.h /usr/include/unistd.h /usr/include/features.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/bits/long-double.h \

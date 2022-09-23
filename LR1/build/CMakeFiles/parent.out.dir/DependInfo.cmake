@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/liguha/OS/LR1/src/parent.c" "CMakeFiles/parent.out.dir/home/liguha/OS/LR1/src/parent.c.o" "gcc" "CMakeFiles/parent.out.dir/home/liguha/OS/LR1/src/parent.c.o.d"
+  "/home/liguha/OS/LR1/src/parent.c" "CMakeFiles/parent.out.dir/src/parent.c.o" "gcc" "CMakeFiles/parent.out.dir/src/parent.c.o.d"
   )
 
 # Targets to which this target links.

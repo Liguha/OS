@@ -54,7 +54,7 @@ RM = /snap/cmake/1156/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/liguha/OS/LR1/CMake
+CMAKE_SOURCE_DIR = /home/liguha/OS/LR1
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/liguha/OS/LR1/build

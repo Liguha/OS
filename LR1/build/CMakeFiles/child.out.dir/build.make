@@ -53,7 +53,7 @@ RM = /snap/cmake/1156/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/liguha/OS/LR1/CMake
+CMAKE_SOURCE_DIR = /home/liguha/OS/LR1
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/liguha/OS/LR1/build
@@ -69,28 +69,28 @@ include CMakeFiles/child.out.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/child.out.dir/flags.make
 
-CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o: CMakeFiles/child.out.dir/flags.make
-CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o: /home/liguha/OS/LR1/src/child.c
-CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o: CMakeFiles/child.out.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/liguha/OS/LR1/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o -MF CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o.d -o CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o -c /home/liguha/OS/LR1/src/child.c
+CMakeFiles/child.out.dir/src/child.c.o: CMakeFiles/child.out.dir/flags.make
+CMakeFiles/child.out.dir/src/child.c.o: /home/liguha/OS/LR1/src/child.c
+CMakeFiles/child.out.dir/src/child.c.o: CMakeFiles/child.out.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/liguha/OS/LR1/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/child.out.dir/src/child.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/child.out.dir/src/child.c.o -MF CMakeFiles/child.out.dir/src/child.c.o.d -o CMakeFiles/child.out.dir/src/child.c.o -c /home/liguha/OS/LR1/src/child.c
 
-CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/liguha/OS/LR1/src/child.c > CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.i
+CMakeFiles/child.out.dir/src/child.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/child.out.dir/src/child.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/liguha/OS/LR1/src/child.c > CMakeFiles/child.out.dir/src/child.c.i
 
-CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/liguha/OS/LR1/src/child.c -o CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.s
+CMakeFiles/child.out.dir/src/child.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/child.out.dir/src/child.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/liguha/OS/LR1/src/child.c -o CMakeFiles/child.out.dir/src/child.c.s
 
 # Object files for target child.out
 child_out_OBJECTS = \
-"CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o"
+"CMakeFiles/child.out.dir/src/child.c.o"
 
 # External object files for target child.out
 child_out_EXTERNAL_OBJECTS =
 
-child.out: CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o
+child.out: CMakeFiles/child.out.dir/src/child.c.o
 child.out: CMakeFiles/child.out.dir/build.make
 child.out: CMakeFiles/child.out.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/liguha/OS/LR1/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable child.out"
@@ -105,6 +105,6 @@ CMakeFiles/child.out.dir/clean:
 .PHONY : CMakeFiles/child.out.dir/clean
 
 CMakeFiles/child.out.dir/depend:
-	cd /home/liguha/OS/LR1/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/liguha/OS/LR1/CMake /home/liguha/OS/LR1/CMake /home/liguha/OS/LR1/build /home/liguha/OS/LR1/build /home/liguha/OS/LR1/build/CMakeFiles/child.out.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/liguha/OS/LR1/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/liguha/OS/LR1 /home/liguha/OS/LR1 /home/liguha/OS/LR1/build /home/liguha/OS/LR1/build /home/liguha/OS/LR1/build/CMakeFiles/child.out.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/child.out.dir/depend
 

@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o"
-  "CMakeFiles/child.out.dir/home/liguha/OS/LR1/src/child.c.o.d"
+  "CMakeFiles/child.out.dir/src/child.c.o"
+  "CMakeFiles/child.out.dir/src/child.c.o.d"
   "child.out"
   "child.out.pdb"
 )
