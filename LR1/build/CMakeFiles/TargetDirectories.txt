@@ -1,4 +1,0 @@
-/home/liguha/OS/LR1/build/CMakeFiles/parent.out.dir
-/home/liguha/OS/LR1/build/CMakeFiles/child.out.dir
-/home/liguha/OS/LR1/build/CMakeFiles/edit_cache.dir
-/home/liguha/OS/LR1/build/CMakeFiles/rebuild_cache.dir
