@@ -2,7 +2,6 @@
 #include "stdlib.h"
 #include "pthread.h"
 
-#define MAX_THREADS 12ll
 #define DECK_SIZE 52
 
 pthread_mutex_t mutex;
@@ -39,20 +38,40 @@ void* make_rounds(void* args)
 int main(int argc, char* argv[])
 {  
     long long rounds = 1;
-    unsigned int seed = 0;
+    int max_threads = 0;
+    unsigned int seed = time(NULL);
     int er;
-    scanf("%lld %u", &rounds, &seed);
-    int d = rounds % MAX_THREADS;
-    long long data[MAX_THREADS][2];
-    pthread_t threads[MAX_THREADS];
+    scanf("%d %lld", &max_threads ,&rounds);
+    int d = rounds % max_threads;
+    long long** data = (long long**)calloc(max_threads, sizeof(long long*));
+    if (data == NULL)
+    {
+        printf("Alloc error");
+        return -1;
+    }
+    for (int i = 0; i < max_threads; i++)
+    {
+        data[i] = (long long*)calloc(2, sizeof(long long));
+        if (data[i] == NULL)
+        {
+            printf("Alloc error");
+            return -1;
+        }
+    }
+    pthread_t* threads = (pthread_t*)calloc(max_threads, sizeof(pthread_t));
+    if (threads == NULL)
+    {
+        printf("Alloc error");
+        return -1;
+    }
     if (er = pthread_mutex_init(&mutex, NULL))
     {
         printf("Mutex init error: %d", er);
         return -1;
     }
-    for (int i = 0; i < min(MAX_THREADS, rounds); i++)
+    for (int i = 0; i < min(max_threads, rounds); i++)
     {
-        data[i][0] = rounds / MAX_THREADS + (d > 0);
+        data[i][0] = rounds / max_threads + (d > 0);
         d--;
         data[i][1] = seed + i;
         if (er = pthread_create(&threads[i], NULL, make_rounds, (void*)data[i]))
@@ -61,7 +80,7 @@ int main(int argc, char* argv[])
             return -1;
         }
     }
-    for (int i = 0; i < min(MAX_THREADS, rounds); i++)
+    for (int i = 0; i < min(max_threads, rounds); i++)
     {
         long long out = 0;
         if (er = pthread_join(threads[i], (void**)&out))
@@ -80,6 +99,10 @@ int main(int argc, char* argv[])
         printf("Mutex destroy error: %d", er);
         return -1;
     }
+    free((void*)threads);
+    for (int i = 0; i < max_threads; i++)
+        free((void*)data[i]);
+    free((void*)data);
     double res = (double)counter / rounds;
     printf("%lf\n", res);
 }
