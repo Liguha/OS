@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/a.out.dir/src/file_mapping.c.o -o a.out  -lpthread 
