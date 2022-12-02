@@ -3,9 +3,13 @@ cmake_minimum_required(VERSION 3.24.2)
 project(LR5)
 include_directories(include)
 
-if (LIB_PRINT_TYPE STREQUAL "EXTENDED")
+if (NOT (DEFINED LIB_PRINT_TYPE))
+	set(LIB_PRINT_TYPE DEFAULT)
+endif ()
+
+if (LIB_PRINT_TYPE STREQUAL EXTENDED)
 	add_compile_definitions(SYSTEM="${CMAKE_SYSTEM}")
-elseif (NOT (LIB_PRINT_TYPE STREQUAL "DEFAULT"))
+elseif (NOT (LIB_PRINT_TYPE STREQUAL DEFAULT))
 	message(FATAL_ERROR "Unexpected LIB_PRINT_TYPE: ${LIB_PRINT_TYPE}")
 endif ()
 
