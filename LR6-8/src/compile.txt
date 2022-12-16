@@ -1,0 +1,3 @@
+g++ -o client distribution_node.cpp -l zmq -pthread
+g++ -o server computing_node.cpp -l zmq
+
