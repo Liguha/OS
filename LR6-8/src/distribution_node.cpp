@@ -113,7 +113,7 @@ bool destroy_node(async_node*& ptr, int id)
     if (ptr->id < id)
         return destroy_node(ptr->R, id);
     ptr->active = false;
-    ptr->q.push({REMOVE});
+    ptr->make_query({REMOVE});
     if (ptr->L != nullptr)
         destroy_node(ptr->L, ptr->L->id);
     if (ptr->R != nullptr)
@@ -241,7 +241,7 @@ int main()
                     continue;
                 }
                 if (node != nullptr)
-                    node->q.push({CREATE, id});
+                    node->make_query({CREATE, id});
                 else
                     cerr << "Error: Already exists\n";
             }
@@ -264,7 +264,7 @@ int main()
             }
             async_node* node = find_node_exec(tree, id);
             if (node != nullptr)
-                node->q.push(v);
+                node->make_query(v);
             else
                 cerr << "Error:" << id - MIN_PORT << ": Not found\n";
         }
