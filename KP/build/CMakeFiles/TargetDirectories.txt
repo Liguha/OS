@@ -1,0 +1,4 @@
+/home/liguha/OS/KP/build/CMakeFiles/server.dir
+/home/liguha/OS/KP/build/CMakeFiles/client.dir
+/home/liguha/OS/KP/build/CMakeFiles/edit_cache.dir
+/home/liguha/OS/KP/build/CMakeFiles/rebuild_cache.dir
