@@ -146,7 +146,8 @@ CMakeFiles/server.dir/src/server.cpp.o: /home/liguha/OS/KP/src/server.cpp \
  /usr/include/c++/9/bits/functional_hash.h \
  /usr/include/c++/9/bits/basic_string.tcc \
  /home/liguha/OS/KP/include/instructions.hpp \
- /home/liguha/OS/KP/include/constants.hpp /usr/include/c++/9/iostream \
+ /home/liguha/OS/KP/include/constants.hpp \
+ /home/liguha/OS/KP/include/check_err.hpp /usr/include/c++/9/iostream \
  /usr/include/c++/9/ostream /usr/include/c++/9/ios \
  /usr/include/c++/9/bits/ios_base.h \
  /usr/include/c++/9/bits/locale_classes.h \
@@ -164,7 +165,8 @@ CMakeFiles/server.dir/src/server.cpp.o: /home/liguha/OS/KP/src/server.cpp \
  /usr/include/c++/9/bits/locale_facets.tcc \
  /usr/include/c++/9/bits/basic_ios.tcc \
  /usr/include/c++/9/bits/ostream.tcc /usr/include/c++/9/istream \
- /usr/include/c++/9/bits/istream.tcc /usr/include/c++/9/set \
+ /usr/include/c++/9/bits/istream.tcc \
+ /home/liguha/OS/KP/include/check_err.hpp /usr/include/c++/9/set \
  /usr/include/c++/9/bits/stl_tree.h \
  /usr/include/c++/9/ext/aligned_buffer.h \
  /usr/include/c++/9/bits/stl_set.h /usr/include/c++/9/bits/stl_multiset.h \

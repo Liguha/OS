@@ -3,22 +3,29 @@
 #include "fcntl.h"
 #include "semaphore.h"
 #include "pthread.h"
+
 #include "constants.hpp"
 #include "instructions.hpp"
+#include "check_err.hpp"
+
 #include <iostream>
 #include <string>
 
 using namespace std;
+
+bool ACTIVE_THD = true;
+bool ACTIVE_MAIN = true;
 
 void* get_thd(void* ptr)
 {
     user_info* info = (user_info*)ptr;
     string str_id = to_string(info->user_id);
     int pipe = open((str_id + get_postfix).c_str(), O_RDWR);
-    while (true)
+    CHECK_ERROR(pipe, "Error: can't open pipe" << endl, ACTIVE_THD = false);
+    while (ACTIVE_THD)
     {
         query_id id;
-        read(pipe, &id, sizeof(id));
+        CHECK_ERROR(read(pipe, &id, sizeof(id)), "Error: pipe read error" << endl, ACTIVE_THD = false);
         switch (id)
         {
             case LOGIN_OK:
@@ -54,18 +61,24 @@ void* get_thd(void* ptr)
                 break;
             }
 
+            case CREATE_G_OK:
+            {
+                cout << "Success create chat" << endl;
+                break;
+            }
+
             case CREATE_G_ERR:
             {
-                cerr << "Error: can't create such group" << endl;
+                cerr << "Error: can't create such chat" << endl;
                 break;
             }
 
             case ADD_G_OK:
             {
                 int n;
-                read(pipe, &n, sizeof(int));
+                CHECK_ERROR(read(pipe, &n, sizeof(int)), "Error: pipe read error" << endl, ACTIVE_THD = false);
                 char* str = (char*)calloc(n, sizeof(char));
-                read(pipe, str, n);
+                CHECK_ERROR(read(pipe, str, n), "Error: pipe read error" << endl, ACTIVE_THD = false);
                 cout << "Welcome in chat " << str << endl;
                 free(str);
                 break;
@@ -73,11 +86,24 @@ void* get_thd(void* ptr)
 
             case ADD_G_ERR:
             {
-                cerr << "Error: can't add this user in this group" << endl;
+                cerr << "Error: can't add this user in this chat" << endl;
                 break;
+            }
+
+            case EXIT:
+            {
+                close(pipe);
+                unlink((to_string(info->user_id) + get_postfix).c_str());
+                unlink((to_string(info->user_id) + send_postfix).c_str());
+                ACTIVE_MAIN = false;
+                return NULL;
             }
         }
     }
+    close(pipe);
+    unlink((to_string(info->user_id) + get_postfix).c_str());
+    unlink((to_string(info->user_id) + send_postfix).c_str());
+    ACTIVE_MAIN = false;
     return NULL;
 }
 
@@ -96,14 +122,21 @@ int main()
     str_get = str_id + get_postfix;
     unlink(str_send.c_str());
     unlink(str_get.c_str());
-    mkfifo(str_send.c_str(), S_IREAD | S_IWRITE);
-    mkfifo(str_get.c_str(), S_IREAD | S_IWRITE);
-    int pipe = open(str_send.c_str(), O_RDWR);;
-    while (true)
+    CHECK_ERROR(mkfifo(str_send.c_str(), S_IREAD | S_IWRITE), "Error: mkfifo error\n", return -1);
+    CHECK_ERROR(mkfifo(str_get.c_str(), S_IREAD | S_IWRITE), "Error: mkfifo error\n", return -1);
+    CHECK_ERROR_PTHREAD(pthread_create(&thd, NULL, get_thd, &info), "Error: error of creating thread\n");
+    CHECK_ERROR_PTHREAD(pthread_detach(thd), "Error: error of detach thread\n");
+    int pipe = open(str_send.c_str(), O_RDWR);
+    CHECK_ERROR(pipe, "Error: can't open pipe\n", return -1);
+
+    while (ACTIVE_MAIN)
     {
         string command;
         query_id id;
         cin >> command;
+
+        if (!ACTIVE_MAIN)
+            return -1;
 
         if (command == "login")
         {
@@ -121,14 +154,12 @@ int main()
                 continue;
             }
             info.username = name;
-            pthread_create(&thd, NULL, get_thd, &info);
-            pthread_detach(thd);
             sem_wait(sem);
-            write(data, &id, sizeof(query_id));
-            write(data, &info.user_id, sizeof(int));
+            CHECK_ERROR(write(data, &id, sizeof(query_id)), "Error: data pipe writing\n", return -1);
+            CHECK_ERROR(write(data, &info.user_id, sizeof(int)), "Error: data pipe writing\n", return -1);
             int len = info.username.length();
-            write(data, &len, sizeof(int));
-            write(data, info.username.c_str(), len);
+            CHECK_ERROR(write(data, &len, sizeof(int)), "Error: data pipe writing\n", return -1);
+            CHECK_ERROR(write(data, info.username.c_str(), len), "Error: data pipe writing\n", return -1);
             sem_post(sem);
         }
 
@@ -155,11 +186,16 @@ int main()
                 id = SEND_PRIVATE;
             if (type == "chat")
                 id = SEND_GROUP;
-            send_message(pipe, msg, id);
+            CHECK_ERROR(send_message(pipe, msg, id), "Error: sending message\n", return -1);
         }
 
         if (command == "chat")
         {
+            if (info.username == "")
+            {
+                cout << "Please, login in the system" << endl;
+                continue;
+            }
             string act, group;
             cin >> act >> group;
             if (act != "create" && act != "add")
@@ -179,7 +215,41 @@ int main()
                 cin >> mod.username;
                 id = ADD_TO_GROUP;
             }
-            send_group_modify(pipe, mod, id);
+            CHECK_ERROR(send_group_modify(pipe, mod, id), "Error: modify chat\n", return -1);
+        }
+
+        if (command == "logout")
+        {
+            if (info.username == "")
+            {
+                cout << "Please, login in the system" << endl;
+                continue;
+            }
+            id = LOGOUT;
+            CHECK_ERROR(write(pipe, &id, sizeof(query_id)), "Error: pipe writing\n", return -1);
+            info.username = "";
+            cout << "Logged-out" << endl;
+        }
+
+        if (command == "exit")
+        {
+            if (info.username != "")
+            {
+                id = LOGOUT;
+                write(pipe, &id, sizeof(query_id));
+            }
+            id = EXIT;
+            sem_wait(sem);
+            write(data, &id, sizeof(query_id));
+            write(data, &info.user_id, sizeof(int));
+            sem_post(sem);
+            close(pipe);
+            close(data);
+            sem_close(sem);
+            while (ACTIVE_MAIN)
+                continue;
+            return 0;
         }
     }
+    return -1;
 }

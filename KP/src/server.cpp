@@ -3,8 +3,11 @@
 #include "fcntl.h"
 #include "semaphore.h"
 #include "pthread.h"
+
 #include "constants.hpp"
 #include "instructions.hpp"
+#include "check_err.hpp"
+
 #include <iostream>
 #include <string>
 #include <set>
@@ -17,7 +20,7 @@ void* user_thd(void*);
 struct user
 {
     user_info info;
-    int pipe_to;
+    int pipe_from, pipe_to;
     pthread_t thd;
 
     user(string login = "", int id = 0)
@@ -25,13 +28,20 @@ struct user
         info.username = login;
         info.user_id = id;
         pipe_to = open((to_string(id) + get_postfix).c_str(), O_RDWR);
-        cout << to_string(id) + get_postfix << " , handle: " << pipe_to << endl;
-        pthread_create(&thd, NULL, user_thd, this);
-        pthread_detach(thd);
+        pipe_from = open((to_string(id) + send_postfix).c_str(), O_RDWR);
+        CHECK_ERROR(min(pipe_to, pipe_from), "Error: pipe of " << id << '\n', return);
+        if (pthread_create(&thd, NULL, user_thd, this) != 0)
+        {
+            cerr << "Error: creating thread (id = " << id << ")\n";
+            return;
+        }
+        if (pthread_detach(thd) != 0)
+            cerr << "Error: detaching thread (id = " << id << ")\n";
     }
 
     ~user()
     {
+        close(pipe_from);
         close(pipe_to);
     }
 };
@@ -39,7 +49,7 @@ struct user
 struct group
 {
     string name;
-    set <user*> members;
+    set <string> members;
 };
 
 map <int, user*> users_id;
@@ -49,7 +59,7 @@ map <string, group*> groups;
 void* user_thd(void* ptr)
 {
     user* usr = (user*)ptr;
-    int pipe = open((to_string(usr->info.user_id) + send_postfix).c_str(), O_RDWR);
+    int pipe = usr->pipe_from;
     while (true)
     {
         query_id id;
@@ -62,11 +72,11 @@ void* user_thd(void* ptr)
                 if (users.count(msg.channel) == 0)
                 {
                     query_id ans = SEND_ERR;
-                    write(usr->pipe_to, &ans, sizeof(query_id));
+                    CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: answering",);
                     break;
                 }
                 int pipe_to = users[msg.channel]->pipe_to;
-                send_message(pipe_to, msg, GET_PRIVATE);
+                CHECK_ERROR(send_message(pipe_to, msg, GET_PRIVATE), "Error: message error\n",);
                 break;
             }
 
@@ -76,22 +86,22 @@ void* user_thd(void* ptr)
                 if (groups.count(msg.channel) == 0)
                 {
                     query_id ans = SEND_ERR;
-                    write(usr->pipe_to, &ans, sizeof(query_id));
+                    CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: answering",);
                     break;
                 }
-                set <user*>& g_users = groups[msg.channel]->members;
-                if (g_users.count(usr) == 0)
+                set <string>& g_users = groups[msg.channel]->members;
+                if (g_users.count(usr->info.username) == 0)
                 {
                     query_id ans = SEND_ERR;
-                    write(usr->pipe_to, &ans, sizeof(query_id));
+                    CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: answering",);
                     break;
                 }
                 for (auto it = g_users.begin(); it != g_users.end(); it++)
                 {
-                    if ((*it)->info.username == msg.author)
+                    if (*it == msg.author || users.count(*it) == 0)
                         continue;
-                    int pipe_to = (*it)->pipe_to;
-                    send_message(pipe_to, msg, GET_GROUP);
+                    int pipe_to = users[*it]->pipe_to;
+                    CHECK_ERROR(send_message(pipe_to, msg, GET_GROUP), "Error: message error\n",);
                 }
                 break;
             }
@@ -102,12 +112,12 @@ void* user_thd(void* ptr)
                 if (groups.count(mod.group) != 0)
                 {
                     query_id ans = CREATE_G_ERR;
-                    write(usr->pipe_to, &ans, sizeof(query_id));
+                    CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: message error\n",);
                     break;
                 }
                 groups[mod.group] = new group();
                 groups[mod.group]->name = mod.group;
-                groups[mod.group]->members.insert(usr);
+                groups[mod.group]->members.insert(usr->info.username);
                 break;
             }
 
@@ -117,23 +127,38 @@ void* user_thd(void* ptr)
                 if (groups.count(mod.group) == 0 || users.count(mod.username) == 0)
                 {
                     query_id ans = ADD_G_ERR;
-                    write(usr->pipe_to, &ans, sizeof(query_id));
+                    CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: message error\n",);
                     break;
                 }
-                set <user*>& g_users = groups[mod.group]->members;
-                if (g_users.count(usr) == 0 || g_users.count(users[mod.username]) != 0)
+                set <string>& g_users = groups[mod.group]->members;
+                if (g_users.count(usr->info.username) == 0 || g_users.count(mod.username) != 0)
                 {
                     query_id ans = ADD_G_ERR;
-                    write(usr->pipe_to, &ans, sizeof(query_id));
+                    CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: message error\n",);
                     break;
                 }
-                g_users.insert(users[mod.username]);
+                g_users.insert(mod.username);
                 query_id ans = ADD_G_OK;
-                write(users[mod.username]->pipe_to, &ans, sizeof(query_id));
+                CHECK_ERROR(write(users[mod.username]->pipe_to, &ans, sizeof(query_id)), "Error: adding in group\n", break);
                 int n = mod.group.length();
-                write(users[mod.username]->pipe_to, &n, sizeof(int));
-                write(users[mod.username]->pipe_to, mod.group.c_str(), n);
+                CHECK_ERROR(write(users[mod.username]->pipe_to, &n, sizeof(int)), "Error: adding in group\n", break);
+                CHECK_ERROR(write(users[mod.username]->pipe_to, mod.group.c_str(), n), "Error: adding in group\n", break);
                 break;
+            }
+
+            case LOGOUT:
+            {
+                string login = usr->info.username;
+                usr->info.username = "";
+                users.erase(login);
+                break;
+            }
+
+            case EXIT:
+            {
+                write(usr->pipe_to, &id, sizeof(query_id));
+                delete usr;
+                return NULL;
             }
         }
     }
@@ -143,9 +168,10 @@ void* user_thd(void* ptr)
 int main()
 {
     unlink(data_pipe.c_str());
-    mkfifo(data_pipe.c_str(), S_IREAD | S_IWRITE);
+    CHECK_ERROR(mkfifo(data_pipe.c_str(), S_IREAD | S_IWRITE), "Error: creating data pipe\n", return -1);
     sem_unlink(sem_name.c_str());
     int data = open(data_pipe.c_str(), O_RDWR);
+    CHECK_ERROR(data, "Error: opening data pipe\n", return -1);
     sem_t* sem = sem_open(sem_name.c_str(), O_CREAT, S_IRUSR | S_IWUSR, 1);
     while (true)
     {
@@ -156,11 +182,11 @@ int main()
             case LOGIN:
             {
                 int user_id;
-                read(data, &user_id, sizeof(int));
+                CHECK_ERROR(read(data, &user_id, sizeof(int)), "Error: reading user data\n", break);
                 int len;
-                read(data, &len, sizeof(int));
+                CHECK_ERROR(read(data, &len, sizeof(int)), "Error: reading user data\n", break);
                 char* str = (char*)calloc(len, sizeof(char));
-                read(data, str, len);
+                CHECK_ERROR(read(data, str, len), "Error: reading user data\n", break);
                 string name = str;
                 free(str);
                 query_id ans;
@@ -168,6 +194,7 @@ int main()
                     users_id[user_id] = new user(name, user_id);
                 if (users.count(name) == 0)
                 {
+                    users_id[user_id]->info.username = name;
                     users[name] = users_id[user_id];
                     ans = LOGIN_OK;
                 }
@@ -176,7 +203,26 @@ int main()
                     users_id[user_id]->info.username = "";
                     ans = LOGIN_ERR;
                 }
-                write(users_id[user_id]->pipe_to, &ans, sizeof(query_id));
+                CHECK_ERROR(write(users_id[user_id]->pipe_to, &ans, sizeof(query_id)), "Error: answering\n",);
+                break;
+            }
+
+            case EXIT:
+            {
+                int usr_id;
+                CHECK_ERROR(read(data, &usr_id, sizeof(int)), "Error: reading user id\n", break);
+                if (users_id.count(usr_id) != 0)
+                {
+                    user* usr = users_id[usr_id];
+                    query_id ans = EXIT;
+                    write(usr->pipe_from, &ans, sizeof(query_id));
+                }
+                else
+                {
+                    int pipe_to = open((to_string(usr_id) + get_postfix).c_str(), O_RDWR);
+                    write(pipe_to, &id, sizeof(query_id));
+                    close(pipe_to);
+                }
                 break;
             }
         }

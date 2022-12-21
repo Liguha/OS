@@ -4,7 +4,10 @@
 #include "unistd.h"
 #include "sys/stat.h"
 #include "fcntl.h"
+
 #include "constants.hpp"
+#include "check_err.hpp"
+
 #include <string>
 
 using namespace std;
@@ -22,18 +25,20 @@ struct message
     string channel = "";
 };
 
-void send_message(int pipe, message msg, query_id id)
+int send_message(int pipe, message msg, query_id id)
 {
-    write(pipe, &id, sizeof(query_id));
+    int ok = 0;
+    CHECK_ERROR(write(pipe, &id, sizeof(query_id)), "", ok = -1);
     int len = msg.author.length();
-    write(pipe, &len, sizeof(int));
-    write(pipe, msg.author.c_str(), len);
+    CHECK_ERROR(write(pipe, &len, sizeof(int)), "", ok = -1);
+    CHECK_ERROR(write(pipe, msg.author.c_str(), len), "", ok = -1);
     len = msg.content.length();
-    write(pipe, &len, sizeof(int));
-    write(pipe, msg.content.c_str(), len);
+    CHECK_ERROR(write(pipe, &len, sizeof(int)), "", ok = -1);
+    CHECK_ERROR(write(pipe, msg.content.c_str(), len), "", ok = -1);
     len = msg.channel.length();
-    write(pipe, &len, sizeof(int));
-    write(pipe, msg.channel.c_str(), len);
+    CHECK_ERROR(write(pipe, &len, sizeof(int)), "", ok = -1);
+    CHECK_ERROR(write(pipe, msg.channel.c_str(), len), "", ok = -1);
+    return ok;
 }
 
 message receive_msg(int pipe)
@@ -64,15 +69,17 @@ struct group_modify
     string username = "";
 };
 
-void send_group_modify(int pipe, group_modify mod, query_id id)
+int send_group_modify(int pipe, group_modify mod, query_id id)
 {
-    write(pipe, &id, sizeof(query_id));
+    int ok = 0;
+    CHECK_ERROR(write(pipe, &id, sizeof(query_id)), "", ok = -1);
     int n = mod.group.length();
-    write(pipe, &n, sizeof(int));
-    write(pipe, mod.group.c_str(), n);
+    CHECK_ERROR(write(pipe, &n, sizeof(int)), "", ok = -1);
+    CHECK_ERROR(write(pipe, mod.group.c_str(), n), "", ok = -1);
     n = mod.username.length();
-    write(pipe, &n, sizeof(int));
-    write(pipe, mod.username.c_str(), n);
+    CHECK_ERROR(write(pipe, &n, sizeof(int)), "", ok = -1);
+    CHECK_ERROR(write(pipe, mod.username.c_str(), n), "", ok = -1);
+    return ok;
 }
 
 group_modify receive_group_modify(int pipe)

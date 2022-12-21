@@ -16,10 +16,13 @@ enum query_id
     SEND_GROUP, 
     GET_GROUP, 
     CREATE_GROUP,
+    CREATE_G_OK,
     CREATE_G_ERR,
     ADD_TO_GROUP,
     ADD_G_OK,
-    ADD_G_ERR
+    ADD_G_ERR,
+    LOGOUT,
+    EXIT
 };
 const string sem_name = "data_semaphore";
 const string data_pipe = "login_data";
