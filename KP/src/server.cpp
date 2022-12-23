@@ -20,6 +20,7 @@ void* user_thd(void*);
 struct user
 {
     user_info info;
+    pthread_mutex_t mutex;
     int pipe_from, pipe_to;
     pthread_t thd;
 
@@ -30,6 +31,7 @@ struct user
         pipe_to = open((to_string(id) + get_postfix).c_str(), O_RDWR);
         pipe_from = open((to_string(id) + send_postfix).c_str(), O_RDWR);
         CHECK_ERROR(min(pipe_to, pipe_from), "Error: pipe of " << id << '\n', return);
+        CHECK_ERROR(pthread_mutex_init(&mutex, NULL), "Error: Gmutex error\n", return);
         if (pthread_create(&thd, NULL, user_thd, this) != 0)
         {
             cerr << "Error: creating thread (id = " << id << ")\n";
@@ -43,6 +45,7 @@ struct user
     {
         close(pipe_from);
         close(pipe_to);
+        pthread_mutex_destroy(&mutex);
     }
 };
 
@@ -72,11 +75,15 @@ void* user_thd(void* ptr)
                 if (users.count(msg.channel) == 0)
                 {
                     query_id ans = SEND_ERR;
+                    CHECK_ERROR(pthread_mutex_lock(&usr->mutex), "Error: mutex lock error\n",);
                     CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: answering",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr->mutex), "Error: mutex unlock error\n",);
                     break;
                 }
-                int pipe_to = users[msg.channel]->pipe_to;
-                CHECK_ERROR(send_message(pipe_to, msg, GET_PRIVATE), "Error: message error\n",);
+                user* usr_to = users[msg.channel];
+                CHECK_ERROR(pthread_mutex_lock(&usr_to->mutex), "Error: mutex lock error\n",);
+                CHECK_ERROR(send_message(usr_to->pipe_to, msg, GET_PRIVATE), "Error: message error\n",);
+                CHECK_ERROR(pthread_mutex_unlock(&usr_to->mutex), "Error: mutex unlock error\n",);
                 break;
             }
 
@@ -86,22 +93,28 @@ void* user_thd(void* ptr)
                 if (groups.count(msg.channel) == 0)
                 {
                     query_id ans = SEND_ERR;
+                    CHECK_ERROR(pthread_mutex_lock(&usr->mutex), "Error: mutex lock error\n",);
                     CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: answering",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr->mutex), "Error: mutex unlock error\n",);
                     break;
                 }
                 set <string>& g_users = groups[msg.channel]->members;
                 if (g_users.count(usr->info.username) == 0)
                 {
                     query_id ans = SEND_ERR;
+                    CHECK_ERROR(pthread_mutex_lock(&usr->mutex), "Error: mutex lock error\n",);
                     CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: answering",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr->mutex), "Error: mutex unlock error\n",);
                     break;
                 }
                 for (auto it = g_users.begin(); it != g_users.end(); it++)
                 {
                     if (*it == msg.author || users.count(*it) == 0)
                         continue;
-                    int pipe_to = users[*it]->pipe_to;
-                    CHECK_ERROR(send_message(pipe_to, msg, GET_GROUP), "Error: message error\n",);
+                    user* usr_to = users[*it];
+                    CHECK_ERROR(pthread_mutex_lock(&usr_to->mutex), "Error: mutex lock error\n",);
+                    CHECK_ERROR(send_message(usr_to->pipe_to, msg, GET_GROUP), "Error: message error\n",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr_to->mutex), "Error: mutex unlock error\n",);
                 }
                 break;
             }
@@ -112,7 +125,9 @@ void* user_thd(void* ptr)
                 if (groups.count(mod.group) != 0)
                 {
                     query_id ans = CREATE_G_ERR;
+                    CHECK_ERROR(pthread_mutex_lock(&usr->mutex), "Error: mutex lock error\n",);
                     CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: message error\n",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr->mutex), "Error: mutex unlock error\n",);
                     break;
                 }
                 groups[mod.group] = new group();
@@ -127,22 +142,29 @@ void* user_thd(void* ptr)
                 if (groups.count(mod.group) == 0 || users.count(mod.username) == 0)
                 {
                     query_id ans = ADD_G_ERR;
+                    CHECK_ERROR(pthread_mutex_lock(&usr->mutex), "Error: mutex lock error\n",);
                     CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: message error\n",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr->mutex), "Error: mutex unlock error\n",);
                     break;
                 }
                 set <string>& g_users = groups[mod.group]->members;
                 if (g_users.count(usr->info.username) == 0 || g_users.count(mod.username) != 0)
                 {
                     query_id ans = ADD_G_ERR;
+                    CHECK_ERROR(pthread_mutex_lock(&usr->mutex), "Error: mutex lock error\n",);
                     CHECK_ERROR(write(usr->pipe_to, &ans, sizeof(query_id)), "Error: message error\n",);
+                    CHECK_ERROR(pthread_mutex_unlock(&usr->mutex), "Error: mutex unlock error\n",);
                     break;
                 }
                 g_users.insert(mod.username);
                 query_id ans = ADD_G_OK;
-                CHECK_ERROR(write(users[mod.username]->pipe_to, &ans, sizeof(query_id)), "Error: adding in group\n", break);
+                user* usr_to = users[mod.username];
+                CHECK_ERROR(pthread_mutex_lock(&usr_to->mutex), "Error: mutex lock error\n", break);
+                CHECK_ERROR(write(usr_to->pipe_to, &ans, sizeof(query_id)), "Error: adding in group\n", break);
                 int n = mod.group.length();
-                CHECK_ERROR(write(users[mod.username]->pipe_to, &n, sizeof(int)), "Error: adding in group\n", break);
-                CHECK_ERROR(write(users[mod.username]->pipe_to, mod.group.c_str(), n), "Error: adding in group\n", break);
+                CHECK_ERROR(write(usr_to->pipe_to, &n, sizeof(int)), "Error: adding in group\n", break);
+                CHECK_ERROR(write(usr_to->pipe_to, mod.group.c_str(), n), "Error: adding in group\n", break);
+                CHECK_ERROR(pthread_mutex_unlock(&usr_to->mutex), "Error: mutex unlock error\n", break);
                 break;
             }
 
@@ -156,7 +178,9 @@ void* user_thd(void* ptr)
 
             case EXIT:
             {
+                pthread_mutex_lock(&usr->mutex);
                 write(usr->pipe_to, &id, sizeof(query_id));
+                pthread_mutex_unlock(&usr->mutex);
                 delete usr;
                 return NULL;
             }
@@ -203,7 +227,9 @@ int main()
                     users_id[user_id]->info.username = "";
                     ans = LOGIN_ERR;
                 }
+                CHECK_ERROR(pthread_mutex_lock(&users_id[user_id]->mutex), "Error: mutex lock error\n",);
                 CHECK_ERROR(write(users_id[user_id]->pipe_to, &ans, sizeof(query_id)), "Error: answering\n",);
+                CHECK_ERROR(pthread_mutex_unlock(&users_id[user_id]->mutex), "Error: mutex unlock error\n",);
                 break;
             }
 
