@@ -1,4 +1,0 @@
-/home/liguha/OS/LR6-8/build/CMakeFiles/client.dir
-/home/liguha/OS/LR6-8/build/CMakeFiles/server.dir
-/home/liguha/OS/LR6-8/build/CMakeFiles/edit_cache.dir
-/home/liguha/OS/LR6-8/build/CMakeFiles/rebuild_cache.dir

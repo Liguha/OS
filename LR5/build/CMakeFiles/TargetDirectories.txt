@@ -1,7 +1,0 @@
-/home/liguha/OS/LR5/build/CMakeFiles/dynamic1.dir
-/home/liguha/OS/LR5/build/CMakeFiles/dynamic2.dir
-/home/liguha/OS/LR5/build/CMakeFiles/program11.out.dir
-/home/liguha/OS/LR5/build/CMakeFiles/program12.out.dir
-/home/liguha/OS/LR5/build/CMakeFiles/program2.out.dir
-/home/liguha/OS/LR5/build/CMakeFiles/edit_cache.dir
-/home/liguha/OS/LR5/build/CMakeFiles/rebuild_cache.dir

@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -shared -Wl,-soname,libdynamic1.so -o libdynamic1.so CMakeFiles/dynamic1.dir/src/functions1.c.o 

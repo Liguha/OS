@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/program11.out.dir/src/program1.c.o -o program11.out  -Wl,-rpath,/home/liguha/OS/LR5/build libdynamic1.so 
